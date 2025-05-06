@@ -9,6 +9,7 @@ app.use(express.json());
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI);
 
+
 // Routes
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes); // Add user routes
