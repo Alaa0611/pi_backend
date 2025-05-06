@@ -1,5 +1,5 @@
 const Category = require('../models/category');
-const Tag = require('../models/Tag');
+const Tag = require('../models/tag');
 
 // Categories CRUD
 exports.getCategories = async (req, res) => {
