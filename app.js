@@ -37,6 +37,7 @@ app.use(bodyParser.json());
 connectDB();
 
 // Routes
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/forum', forumRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/categories', categoryRoutes);

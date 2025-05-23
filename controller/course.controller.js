@@ -92,8 +92,9 @@ exports.createCourse = async (req, res) => {
 exports.serveCourseCover = async (req, res) => {
   try {
     const filename = req.params.filename;
-    const filePath = path.join('../images', filename);
-    
+    const path = require('path');
+
+    const filePath = path.join(__dirname, 'images', filename);    
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: 'File not found' });
     }
