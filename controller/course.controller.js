@@ -41,7 +41,7 @@ exports.createCourse = async (req, res) => {
     }
 
     if (req.file) {
-      courseData.coverImageUrl = `/uploads/course-covers/${req.file.filename}`;
+      courseData.coverImageUrl = `${req.file.filename}`;
     }
 
     const course = await Course.create(courseData);
@@ -93,8 +93,7 @@ exports.serveCourseCover = async (req, res) => {
   try {
     const filename = req.params.filename;
     const path = require('path');
-
-    const filePath = path.join(__dirname, 'images', filename);    
+    const filePath = path.join(__dirname, '..', 'images');
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: 'File not found' });
     }
