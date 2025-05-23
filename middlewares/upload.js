@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 
 const storage = multer.diskStorage({
-  destination: 'D:/PI2025/pi-project/angular/src/assets/uploads/course-covers',
+  destination: '/',
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, `cover-${uniqueSuffix}${path.extname(file.originalname)}`);
