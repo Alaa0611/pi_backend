@@ -181,9 +181,41 @@ exports.getAllCourses = async (req, res) => {
   }
 };
 exports.getCourseById = async (req, res) => {
-  const course = await Course.findById(req.params.id);
-  if (!course) return res.status(404).json({ error: "Course not found" });
-  res.json(course);
+  try {
+    const course = await Course.findById(req.params.id).lean();
+    if (!course) {
+      return res.status(404).json({ 
+        success: false,
+        error: "Course not found" 
+      });
+    }
+
+    const lessons = await Lesson.find({ courseId: course._id })
+      .sort({ order: 1 })
+      .lean();
+
+    const lessonCount = await Lesson.countDocuments({ courseId: course._id });
+
+    // const enrolledCount = await Enrollment.countDocuments({ courseId: course._id });
+
+    res.json({
+      success: true,
+      data: {
+        ...course,
+        lessons,
+        lessonCount,
+        // enrolledCount, 
+      }
+    });
+
+  } catch (err) {
+    console.error('Error fetching course:', err);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to fetch course',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
 };
 
 exports.updateCourse = async (req, res) => {
