@@ -18,6 +18,7 @@ const courseRouter = require("./routes/course.routes");
 const lessonRouter = require("./routes/lesson.routes");
 const reviewRouter = require("./routes/review.routes");
 const progressRouter = require("./routes/progress.routes");
+const quizAttemptRoutes = require("./routes/quizAttempt");
 const quizRouter = require("./routes/quizRoutes");
 const certifRouter = require("./routes/certifRoutes");
 const swaggerUi = require("swagger-ui-express");

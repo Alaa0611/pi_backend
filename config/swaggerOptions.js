@@ -54,6 +54,44 @@ const options = {
             },
           },
         },
+        // Quiz Attempt Schema
+        QuizAttempt: {
+          type: "object",
+          properties: {
+            _id: { type: "string" },
+            student: { type: "string" },
+            quiz: {
+              type: "object",
+              properties: {
+                _id: { type: "string" },
+                title: { type: "string" },
+                passingScore: { type: "number" },
+              },
+            },
+            totalQuestions: { type: "integer" },
+            correctAnswers: { type: "integer" },
+            totalMarks: { type: "number" },
+            createdAt: { type: "string", format: "date-time" },
+          },
+        },
+        // Quiz Attempt Submission Schema
+        QuizAttemptSubmission: {
+          type: "object",
+          required: ["quizId", "answers"],
+          properties: {
+            quizId: { type: "string" },
+            answers: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  questionId: { type: "string" },
+                  selectedOption: { type: "string" },
+                },
+              },
+            },
+          },
+        },
         // Certificate Schema
         Certificate: {
           type: "object",
@@ -107,7 +145,10 @@ const options = {
           properties: {
             _id: { type: "string" },
             title: { type: "string", example: "Learn Node.js" },
-            description: { type: "string", example: "Master Node.js from scratch." },
+            description: {
+              type: "string",
+              example: "Master Node.js from scratch.",
+            },
             author: { type: "string", example: "John Doe" },
             category: { type: "string", example: "Development" },
             tags: {
@@ -124,7 +165,10 @@ const options = {
             _id: { type: "string" },
             courseId: { type: "string" },
             title: { type: "string", example: "Introduction to Node.js" },
-            content: { type: "string", example: "This lesson covers the basics of Node.js." },
+            content: {
+              type: "string",
+              example: "This lesson covers the basics of Node.js.",
+            },
           },
         },
         // Forum Schema
@@ -133,7 +177,10 @@ const options = {
           required: ["title", "content", "author"],
           properties: {
             title: { type: "string", example: "Node.js Discussion" },
-            content: { type: "string", example: "Let's discuss the best practices in Node.js." },
+            content: {
+              type: "string",
+              example: "Let's discuss the best practices in Node.js.",
+            },
             author: { type: "ObjectId", example: "031065061351" },
           },
         },
