@@ -106,4 +106,44 @@ router.get("/:id", auth, quizAttemptController.getQuizAttemptDetails);
  */
 router.post("/", auth, quizAttemptController.submitQuizAttempt);
 
+// Add this new route below your existing routes
+/**
+ * @swagger
+ * /api/quizAttempt/instructor:
+ *   get:
+ *     summary: Get all quiz attempts for instructors
+ *     tags: [Quiz Attempts]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Items per page
+ *     responses:
+ *       200:
+ *         description: List of all quiz attempts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/QuizAttempt'
+ *                 total:
+ *                   type: integer
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.get("/instructor", auth, quizAttemptController.getQuizAttemptsForInstructor);
 module.exports = router;

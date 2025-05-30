@@ -1,19 +1,19 @@
-const express = require('express');
-const http = require('http');
-const path = require('path')
-const socketio = require('socket.io');
-const cors = require('cors');
-require('dotenv').config();
-const connectDB = require('./config/db');
-const forumRoutes = require('./routes/forum');
-const categoryRoutes = require('./routes/category');
-const authRoutes = require('./routes/auth');
-const { initSocket } = require('./socket/socket');
-const notificationRoutes = require('./routes/notification');
-const userRoutes = require('./routes/user');
-const adminRoutes = require('./routes/admin/adminRoutes');
-const uploadRoute = require('./routes/upload');
-const bodyParser = require('body-parser');
+const express = require("express");
+const http = require("http");
+const path = require("path");
+const socketio = require("socket.io");
+const cors = require("cors");
+require("dotenv").config();
+const connectDB = require("./config/db");
+const forumRoutes = require("./routes/forum");
+const categoryRoutes = require("./routes/category");
+const authRoutes = require("./routes/auth");
+const { initSocket } = require("./socket/socket");
+const notificationRoutes = require("./routes/notification");
+const userRoutes = require("./routes/user");
+const adminRoutes = require("./routes/admin/adminRoutes");
+const uploadRoute = require("./routes/upload");
+const bodyParser = require("body-parser");
 const courseRouter = require("./routes/course.routes");
 const lessonRouter = require("./routes/lesson.routes");
 const reviewRouter = require("./routes/review.routes");
@@ -27,7 +27,7 @@ const swaggerSpec = require("./config/swaggerOptions");
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server, {
-  cors: { origin: '*' }
+  cors: { origin: "*" },
 });
 
 // Middlewares
@@ -38,14 +38,14 @@ app.use(bodyParser.json());
 connectDB();
 
 // Routes
-app.use('/images', express.static(path.join(__dirname, 'images')));
-app.use('/api/forum', forumRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/upload', uploadRoute);
+app.use("/images", express.static(path.join(__dirname, "images")));
+app.use("/api/forum", forumRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/upload", uploadRoute);
 app.use("/api/courses", courseRouter);
 app.use("/api/lessons", lessonRouter);
 app.use("/api/reviews", reviewRouter);
@@ -53,7 +53,7 @@ app.use("/api/progress", progressRouter);
 app.use("/api/quizzes", quizRouter);
 app.use("/api/certif", certifRouter);
 app.use("/certificates", express.static(path.join(__dirname, "certificates")));
-
+app.use("/api/quizAttempt", quizAttemptRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use((req, res, next) => {
   res.status(404).json({ error: `Route ${req.originalUrl} not found` });

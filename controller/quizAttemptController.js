@@ -90,3 +90,27 @@ exports.submitQuizAttempt = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+exports.getQuizAttemptsForInstructor = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const attempts = await QuizAttempt.find()
+      .populate("student", "name email") // Add student population
+      .populate("quiz", "title passingScore")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await QuizAttempt.countDocuments();
+
+    res.json({
+      data: attempts,
+      total,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
