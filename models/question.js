@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 
 const QuestionSchema = new mongoose.Schema({
-  type: String, 
-  question: String,
+  questionText: String,
   options: [String],
-  correctAnswer: mongoose.Schema.Types.Mixed,
+  correctAnswer: String,
+  points: Number, // Changed from String to Number
+  explanation: String
 });
 
 module.exports = QuestionSchema;
