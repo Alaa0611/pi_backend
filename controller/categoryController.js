@@ -1,11 +1,56 @@
+const { string } = require('yup');
 const Category = require('../models/category');
 const Tag = require('../models/tag');
 
 // Categories CRUD
 exports.getCategories = async (req, res) => {
   const cats = await Category.find().populate('parent');
-  res.json(cats);
+  const totalCount = await Category.countDocuments();
+  res.json({
+        cats: cats,
+        totalCount: totalCount,
+      });
 };
+
+exports.getCategoryByName = async (req, res) => {
+  try {
+    // const { name } = req.query;
+
+    // Validate input
+    if (!req.query.name || typeof req.query.name !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Name parameter is required and must be a string'
+      });
+    }
+
+    // Find category with case-insensitive search
+    const category = await Category.findOne({ 
+      name: { $regex: new RegExp(`^${req.query.name}$`, 'i') } 
+    }).populate('parent', 'name'); // Populate parent category name
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        _id: category._id,
+        name: category.name,
+        parent: category.parent,
+        fullPath: await getCategoryPath(category) // Optional: get full hierarchy path
+      }
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err }); // Add error response
+  }
+}
 
 exports.getCategoryById = async (req, res) => {
     try{

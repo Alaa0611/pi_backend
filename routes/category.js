@@ -122,5 +122,6 @@ router.post('/tags/add', catCtrl.createTag);
 router.delete('/tags/:id', catCtrl.deleteTag);
 
 router.get('/:id', catCtrl.getCategoryById);
+router.get('/byname', catCtrl.getCategoryByName);
 
 module.exports = router;

@@ -22,8 +22,9 @@ async function getTopicById(req, res) {
       .populate('author', 'username email') // Only include username and email
       .populate('category', 'name') // Only include category name
       .populate({
-        path: 'messages.author',
-        select: 'username' // Populate message authors
+        path: 'messages',
+        // Get friends of friends - populate the 'friends' array for every friend
+        populate: { path: 'author' }
       })
       .exec();
 
@@ -64,6 +65,7 @@ async function deleteTopic(req, res){
   }
 }
 
+
 async function addMessage(req, res){
   try {
     const topic = await Topic.findById(req.params.id);
@@ -77,35 +79,32 @@ async function addMessage(req, res){
 }
 
 async function searchTopics(req, res) {
-  try {
-    // Extract query parameters
-    const { category, tags, search, page, pageSize, limit } = req.query;
-    
+  try {    
     // Build the query
     let query = {};
     
     // Category filter
-    if (category) {
-      query.category = category;
+    if (req.query.category) {
+      query.category = req.query.category;
     }
     
     // Tags filter (AND condition - topic must include all specified tags)
-    if (tags) {
-      const tagsArray = Array.isArray(tags) ? tags : [tags];
+    if (req.query.tags) {
+      const tagsArray = Array.isArray(req.query.tags) ? req.query.tags : [req.query.tags];
       query.tags = { $all: tagsArray };
     }
     
     // Search filter (searches title and content)
-    if (search) {
+    if (req.query.search) {
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } }
+        { title: { $regex: req.query.search, $options: 'i' } },
+        { content: { $regex: req.query.search, $options: 'i' } }
       ];
     }
     
     // Pagination settings
-    const currentPage = parseInt(page) || 1;
-    const itemsPerPage = parseInt(pageSize) || 10;
+    const currentPage = parseInt(req.query.page) || 1;
+    const itemsPerPage = parseInt(req.query.pageSize) || 10;
     const skip = (currentPage - 1) * itemsPerPage;
     
     // Get total count for pagination
@@ -113,11 +112,18 @@ async function searchTopics(req, res) {
     
     // Build the database query
     let dbQuery = Topic.find(query)
+      .populate('author')
+      .populate('category')
+      .populate({
+        path: 'messages',
+        // Get friends of friends - populate the 'friends' array for every friend
+        populate: { path: 'author' }
+      })
       .sort({ createdAt: -1 }); // Sort by newest first
     
     // Apply limit if specified (overrides pagination)
-    if (limit) {
-      dbQuery = dbQuery.limit(parseInt(limit));
+    if (req.query.limit) {
+      dbQuery = dbQuery.limit(parseInt(req.query.limit));
     } else {
       // Apply pagination if no limit
       dbQuery = dbQuery.skip(skip).limit(itemsPerPage);
@@ -127,7 +133,7 @@ async function searchTopics(req, res) {
     const topics = await dbQuery.exec();
     
     // Return response
-    if (limit) {
+    if (req.query.limit) {
       // When limit is specified, return just the array
       res.json(topics);
     } else {

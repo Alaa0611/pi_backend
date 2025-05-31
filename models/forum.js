@@ -1,8 +1,13 @@
 const mongoose = require('mongoose');
+const { required } = require('../middll/course.validation');
 
 const MessageSchema = new mongoose.Schema({
-  author: { type: String, required: false },
+  author: { type: String, ref: 'User', required: false },
   content: { type: String, required: true },
+  sentiment : {
+    label: { type: String},
+    score: {type: Number}
+  }, 
   createdAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
