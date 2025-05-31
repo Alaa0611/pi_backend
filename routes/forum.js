@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const Topic = require("../models/forum")
 const forumCtrl = require('../controller/forumController');
 
 /**
@@ -139,5 +140,19 @@ router.post('/:id/message', forumCtrl.addMessage);
  *         description: Matching topics found
  */
 router.get('/search', forumCtrl.searchTopics);
+
+// Like topic
+router.post('/:id/like', async (req, res) => {
+  try {
+    const topic = await Topic.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { likes: 1 } },
+      { new: true }
+    );
+    res.json(topic);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;
