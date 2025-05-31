@@ -113,8 +113,8 @@ async function searchTopics(req, res) {
     } else {
       // Otherwise return paginated response
       res.json({
-        topics,
-        totalCount,
+        topics: topics,
+        totalCount: totalCount,
         currentPage,
         totalPages: Math.ceil(totalCount / itemsPerPage)
       });
