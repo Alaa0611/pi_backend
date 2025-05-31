@@ -41,7 +41,7 @@ router.get('/', forumCtrl.getTopics);
  *       404:
  *         description: Topic not found
  */
-router.get('/:id', forumCtrl.getTopic);
+router.get('/topicbyid/:id', forumCtrl.getTopicById);
 
 /**
  * @swagger
@@ -67,7 +67,7 @@ router.get('/:id', forumCtrl.getTopic);
  *       201:
  *         description: Topic created successfully
  */
-router.post('/', forumCtrl.createTopic);
+router.post('/createtopic/', forumCtrl.createTopic);
 
 /**
  * @swagger
@@ -88,7 +88,7 @@ router.post('/', forumCtrl.createTopic);
  *       404:
  *         description: Topic not found
  */
-router.delete('/:id', forumCtrl.deleteTopic);
+router.delete('/deletetopic/:id', forumCtrl.deleteTopic);
 
 /**
  * @swagger
@@ -120,7 +120,7 @@ router.delete('/:id', forumCtrl.deleteTopic);
  *       404:
  *         description: Topic not found
  */
-router.post('/:id/message', forumCtrl.addMessage);
+router.post('/addmessage/:id', forumCtrl.addMessage);
 
 /**
  * @swagger
@@ -139,10 +139,10 @@ router.post('/:id/message', forumCtrl.addMessage);
  *       200:
  *         description: Matching topics found
  */
-router.get('/search', forumCtrl.searchTopics);
+router.get('/filtertopics', forumCtrl.searchTopics);
 
 // Like topic
-router.post('/:id/like', async (req, res) => {
+router.post('/liketopics/:id/like', async (req, res) => {
   try {
     const topic = await Topic.findByIdAndUpdate(
       req.params.id,
@@ -155,7 +155,7 @@ router.post('/:id/like', async (req, res) => {
   }
 });
 
-router.post('/:id/dislike', async (req, res) => {
+router.post('/disliketopics/:id/dislike', async (req, res) => {
   try {
     const topic = await Topic.findByIdAndUpdate(
       req.params.id,

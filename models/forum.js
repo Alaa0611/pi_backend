@@ -1,15 +1,26 @@
 const mongoose = require('mongoose');
 
 const MessageSchema = new mongoose.Schema({
-  author: { type: String, required: true },
+  author: { type: String, required: false },
   content: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 
 const TopicSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String },
-  author: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
+  author: { 
+  type: mongoose.Schema.Types.ObjectId, 
+  ref: 'User',
+  required: true,
+  validate: {
+    validator: async function(v) {
+      const user = await mongoose.model('User').findById(v);
+      return user !== null;
+    },
+    message: props => `User ${props.value} does not exist`
+  }
+},
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'category' },
   tags: [{ type: mongoose.Schema.Types.String}],
   messages: [MessageSchema],

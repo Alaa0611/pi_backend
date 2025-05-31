@@ -1,4 +1,5 @@
 const Topic = require('../models/forum');
+const mongoose = require('mongoose');
 
 async function getTopics(req, res) {
   try {
@@ -9,18 +10,37 @@ async function getTopics(req, res) {
   }
 }
 
-async function getTopic(req, res){
+async function getTopicById(req, res) {
   try {
-    const filter = {};
-    if (req.query.category) filter.category = req.query.category;
-    if (req.query.tag) filter.tags = req.query.tag;
-    const topics = await Topic.find(filter)
-      .populate('author', 'email')
-      .populate('category')
-      .populate('tags');
-    res.json(topics);
+    const topicId = req.params.id; // Get ID from URL params
+    
+    if (!mongoose.Types.ObjectId.isValid(topicId)) {
+      return res.status(400).json({ error: 'Invalid topic ID' });
+    }
+
+    const topic = await Topic.findById(topicId)
+      .populate('author', 'username email') // Only include username and email
+      .populate('category', 'name') // Only include category name
+      .populate({
+        path: 'messages.author',
+        select: 'username' // Populate message authors
+      })
+      .exec();
+
+    if (!topic) {
+      return res.status(404).json({ error: 'Topic not found' });
+    }
+
+    res.json({
+      ...topic.toObject(),
+      // Add any additional transformations here
+    });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ 
+      error: 'Server error',
+      details: err.message 
+    });
   }
 }
 
@@ -127,7 +147,7 @@ async function searchTopics(req, res) {
 
 module.exports = {
     getTopics,
-    getTopic,
+    getTopicById,
     createTopic,
     deleteTopic,
     addMessage,
