@@ -155,4 +155,17 @@ router.post('/:id/like', async (req, res) => {
   }
 });
 
+router.post('/:id/dislike', async (req, res) => {
+  try {
+    const topic = await Topic.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { dislikes: 1 } },
+      { new: true }
+    );
+    res.json(topic);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
