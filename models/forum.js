@@ -17,4 +17,8 @@ const TopicSchema = new mongoose.Schema({
   dislikes : { type: Number, default : 0},
 }, { timestamps: true });
 
+TopicSchema.index({ category: 1 });
+TopicSchema.index({ tags: 1 });
+TopicSchema.index({ title: 'text', content: 'text' });
+
 module.exports = mongoose.model('topic', TopicSchema);

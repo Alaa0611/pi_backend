@@ -58,39 +58,70 @@ async function addMessage(req, res){
 
 async function searchTopics(req, res) {
   try {
-    const { keyword, category, tags, startDate, endDate } = req.query;
-
-    // Build the search query
+    // Extract query parameters
+    const { category, tags, search, page, pageSize, limit } = req.query;
+    
+    // Build the query
     let query = {};
-
-    if (keyword) {
-      query.title = { $regex: keyword, $options: 'i' };
-    }
-
+    
+    // Category filter
     if (category) {
       query.category = category;
     }
-
+    
+    // Tags filter (AND condition - topic must include all specified tags)
     if (tags) {
-      const tagsArray = tags.split(',').map(tag => tag.trim());
+      const tagsArray = Array.isArray(tags) ? tags : [tags];
       query.tags = { $all: tagsArray };
     }
-
-    if (startDate || endDate) {
-      query.createdAt = {};
-      if (startDate) query.createdAt.$gte = new Date(startDate);
-      if (endDate) query.createdAt.$lte = new Date(endDate);
+    
+    // Search filter (searches title and content)
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { content: { $regex: search, $options: 'i' } }
+      ];
     }
-
-    const topics = await Topic.find(query)
-      .populate('category')
-      .populate('author')
-      .sort({ createdAt: -1 });
-
-    res.status(200).json(topics);
-  } catch (error) {
-    console.error('Search Error:', error);
-    res.status(500).json({ error: 'Server Error' });
+    
+    // Pagination settings
+    const currentPage = parseInt(page) || 1;
+    const itemsPerPage = parseInt(pageSize) || 10;
+    const skip = (currentPage - 1) * itemsPerPage;
+    
+    // Get total count for pagination
+    const totalCount = await Topic.countDocuments(query);
+    
+    // Build the database query
+    let dbQuery = Topic.find(query)
+      .sort({ createdAt: -1 }); // Sort by newest first
+    
+    // Apply limit if specified (overrides pagination)
+    if (limit) {
+      dbQuery = dbQuery.limit(parseInt(limit));
+    } else {
+      // Apply pagination if no limit
+      dbQuery = dbQuery.skip(skip).limit(itemsPerPage);
+    }
+    
+    // Execute query
+    const topics = await dbQuery.exec();
+    
+    // Return response
+    if (limit) {
+      // When limit is specified, return just the array
+      res.json(topics);
+    } else {
+      // Otherwise return paginated response
+      res.json({
+        topics,
+        totalCount,
+        currentPage,
+        totalPages: Math.ceil(totalCount / itemsPerPage)
+      });
+    }
+    
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
